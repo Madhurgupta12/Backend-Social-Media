@@ -8,14 +8,28 @@ const {JWT_SECRET}=require("../keys");
 const requireLogin=require("../middleware/requireLogin");
 
 const nodemailer=require("nodemailer");
-const sendgridTransport=require("nodemailer-sendgrid-transport");
-
-const transporter=nodemailer.createTransport(sendgridTransport({
+const transporter=nodemailer.createTransport({
+  host:"smtp.gmail.com",
+  port:587,
+  secure:false,
+  requireTLS:true,
   auth:{
-    api_key:"297BD4AB9446B66EDACF84D08218B75E588EEEE6CD56CE8CBBDFD2A16348F8899B1631C8089AD60F9CA73C196EA23F7F"
-
+    user:"om96002@gmail.com",
+    pass:"ukpxerivmiqgvqje"
   }
-}))
+})
+
+const mailOptions={
+  from:"om96002@gmail.com",
+  to:"om96002@gmail.com",
+  subject:"welcome to Instagram",
+  text:"welcome to Instagram"
+
+}
+
+
+
+
 
 router.get("/", (req, res) => {
   res.send("hello");
@@ -42,19 +56,18 @@ router.post("/signup", (req, res) => {
           
             user.save()
             .then((user) => {
-              const mailOptions = {
-                from: 'your_email@example.com',
-                to: user.email,
-                subject: 'Sending email using SendGrid and Node.js',
-                text: 'This is a test email sent using SendGrid and Node.js!'
-              };
-              transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                  console.error('Error occurred: ', error);
-                } else {
-                  console.log('Email sent: ', info.response);
-                }
-              });
+
+transporter.sendMail(mailOptions,function(err,info){
+  if(err)
+  {
+    console.error(err);
+  }
+  else
+  {
+    console.log("mail send successfully");
+  }
+})
+             
          return res.json({ message: "saved successfully" });
             })
             .catch((err) => {
