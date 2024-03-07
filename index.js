@@ -12,12 +12,13 @@ app.use(cors());
 require("./models/post");
 require("./models/user");
 
-//D0D826CD65D1103FDF11AF472A93A6AC6E281722CBFBDE23DE55A51F5B5A04AD0E5FC72EA3F6238FC84218A26AADA7E8
+
 
 
 
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
+app.use(require("./routes/chat"));
 
 
 
