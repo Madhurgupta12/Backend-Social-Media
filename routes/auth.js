@@ -123,4 +123,47 @@ else
 
 })
 
+router.post("/google",(req,res)=>{
+  const {name,email,password}=req.body;
+ 
+  const result=User.findOne({email:email})
+  .then(savedUser=>{
+if(savedUser)
+{
+  const token=jwt.sign({_id:savedUser._id},JWT_SECRET)
+  const {_id}=savedUser;
+return res.status(200).json({success:true,token,user:{_id,name,email}});
+}
+else
+{
+  const dd=new User({name:name,email:email,password:password})
+    dd.save()
+    .then((saved)=>{
+if(saved)
+{
+
+  const {_id}=saved;
+  const token=jwt.sign({_id:saved._id},JWT_SECRET)
+return res.status(200).json({success:true,token,user:{_id,name,email}});
+}
+else
+{
+return res.status(200).json({success:false});
+}
+    })
+
+    .catch(err=>{
+      return res.status(404).json({success:false,message:err.message});
+    })
+}
+  })
+  
+
+
+})
+
+
+
+
+
 module.exports = router;
