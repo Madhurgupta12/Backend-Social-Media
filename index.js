@@ -19,6 +19,7 @@ require("./models/user");
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
 app.use(require("./routes/chat"));
+app.use(require("./routes/reel"));
 
 
 
@@ -41,7 +42,9 @@ const customMiddleware =(req,res,next)=>{
 
 
 
-
+app.get("/",(req,res)=>{
+    res.send("fgg");
+})
 
 app.listen(PORT,()=>{
     console.log("Server is running on",PORT);
