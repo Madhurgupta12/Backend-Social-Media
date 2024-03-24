@@ -42,7 +42,7 @@ const customMiddleware =(req,res,next)=>{
 
 
 
-app.get("/",()=>{
+app.get("/",(req,res)=>{
     res.send("fgg");
 })
 
