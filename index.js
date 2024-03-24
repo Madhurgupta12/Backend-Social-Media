@@ -42,7 +42,9 @@ const customMiddleware =(req,res,next)=>{
 
 
 
-
+app.get("/",()=>{
+    res.send("fgg");
+})
 
 app.listen(PORT,()=>{
     console.log("Server is running on",PORT);
