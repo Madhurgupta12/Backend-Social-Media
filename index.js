@@ -12,27 +12,21 @@ app.use(cors());
 const io=require('socket.io')(8000);
 console.log(`socket server started on ${8000}`);
 const users={};
-io.on("connection",socket=>{
-    socket.on("new-user-joined",name=>{
-        console.log("New User",name);
-        users[socket.id]=name;
-        socket.broadcast.emit("user-joined",name);
+io.on('connection', (socket) => {
+    console.log('A user connected');
 
+    // Listen for chat messages
+    socket.on('chat message', (msg) => {
+        console.log(msg);
+        // Broadcast the message to all connected clients
+        io.emit('chat message', msg);
+    });
 
-    })
-    socket.on("send",message=>{
-         socket.broadcast.emit("receive",{message:message,name:users[socket.id]})
-
-        
-    })
-    socket.on("disconnect",message=>{
-        socket.broadcast.emit('leave',users[socket.id]);
-        delete users[socket.id];
-
-       
-   })
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 });
-
 
 
 require("./models/post");
