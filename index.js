@@ -9,6 +9,32 @@ app.use(express.json());
 app.use(cors());
 
 
+const io=require('socket.io')(8000);
+console.log(`socket server started on ${8000}`);
+const users={};
+io.on("connection",socket=>{
+    socket.on("new-user-joined",name=>{
+        console.log("New User",name);
+        users[socket.id]=name;
+        socket.broadcast.emit("user-joined",name);
+
+
+    })
+    socket.on("send",message=>{
+         socket.broadcast.emit("receive",{message:message,name:users[socket.id]})
+
+        
+    })
+    socket.on("disconnect",message=>{
+        socket.broadcast.emit('leave',users[socket.id]);
+        delete users[socket.id];
+
+       
+   })
+});
+
+
+
 require("./models/post");
 require("./models/user");
 
