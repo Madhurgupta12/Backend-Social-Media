@@ -30,14 +30,14 @@ router.get('/api/chat', async (req, res) => {
 
   router.post('/api/message/send',requiredLogin,async(req, res) => {
 
-    const { text,rr} = req.body;
+    const {text,rr} = req.body;
  
     try {
       // Create a new chat message
       const newMessage = new Chat({
         sender:req.user,
         recipient:rr,
-        text,
+        text:text,
       });
   
       // Save the message to the database
