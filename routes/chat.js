@@ -3,6 +3,8 @@ const mongoose=require("mongoose");
 const router=express.Router();
 const requiredLogin=require("../middleware/requireLogin");
 const User=mongoose.model("User");
+const Chat =require("../models/ChatData")
+const { ObjectId } = require('mongodb');
 
 // API endpoint for searching users by username
 router.get('/api/chat', async (req, res) => {
@@ -26,9 +28,53 @@ router.get('/api/chat', async (req, res) => {
   });
 
 
+  router.post('/api/message/send',requiredLogin,async(req, res) => {
 
+    const { text,rr} = req.body;
+ 
+    try {
+      // Create a new chat message
+      const newMessage = new Chat({
+        sender:req.user,
+        recipient:rr,
+        text,
+      });
+  
+      // Save the message to the database
+      await newMessage.save();
+  
+      res.status(201).json({ success: true, message: newMessage });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      res.status(500).json({ success: false, error: 'Error sending message' });
+    }
+  });
+
+  router.get('/api/messages/:receipt', requiredLogin,async (req, res) => {
+
+
+    try {
+      // Find chat messages exchanged between the two users
+      const aa=req.params.receipt
+      const messages = await Chat.find({
+        $or: [
+          {sender:req.user,recipient:aa},
+         
+        ],
+      }).sort({ timestamp: 1 }); 
+      // Sorting by timestamp ascending
+
+     
+  
+     return res.status(200).json({ success: true,data:messages});
+    } catch (error) {
+      console.error('Error retrieving messages:', error);
+      res.status(500).json({ success: false, error: 'Error retrieving messages' });
+    }
+  });
 
   router.post("/accesschat",(req,res)=>{
+
     return res.json({success:"hello"});
   })
   
