@@ -16,9 +16,6 @@ router.get('/api/chat', async (req, res) => {
 
       }:{}
 
-  
-      
-
       const users = await User.find(keyword
        
       );
@@ -27,6 +24,8 @@ router.get('/api/chat', async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
+
+
 
 
   router.post("/accesschat",(req,res)=>{
