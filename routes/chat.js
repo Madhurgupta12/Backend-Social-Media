@@ -56,6 +56,7 @@ router.get('/api/chat', async (req, res) => {
     try {
       // Find chat messages exchanged between the two users
       const aa=req.params.receipt
+      const check=await User.findById(aa);
       const messages = await Chat.find({
         $or: [
           {sender:req.user._id,recipient:aa},
@@ -71,7 +72,7 @@ router.get('/api/chat', async (req, res) => {
         ],
       }).sort({ timestamp: 1 }); 
   
-     return res.status(200).json({ success: true,data:messages,data2:dd});
+     return res.status(200).json({ success: true,data:messages,data2:dd,nn:check.name});
     } catch (error) {
       console.error('Error retrieving messages:', error);
       res.status(500).json({ success: false, error: 'Error retrieving messages' });
