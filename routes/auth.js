@@ -172,7 +172,7 @@ router.post("/forgot",async(req,res)=>{
   const email=req.body.email;
   const maill={
     from:"om96002@gmail.com",
-    to:"om96002@gmail.com",
+    to:email,
     subject:"Regarding Forgot Password",
     text:"Your Otp is 1234"
     
