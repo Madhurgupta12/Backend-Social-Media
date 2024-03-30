@@ -33,6 +33,7 @@ const mailOptions={
 
 
 
+
 router.get("/protected",requireLogin,(req,res)=>{
     res.send("hello user verified");
 })
@@ -158,6 +159,47 @@ return res.status(200).json({success:false});
   
 
 
+})
+
+
+router.post("/forgot",async(req,res)=>{
+
+
+
+  const aa=await User.findOne({email:req.body.email})
+  if(aa)
+  {
+  const email=req.body.email;
+  const maill={
+    from:"om96002@gmail.com",
+    to:"om96002@gmail.com",
+    subject:"Regarding Forgot Password",
+    text:"Your Otp is 1234"
+    
+  }
+
+  transporter.sendMail(maill,function(err,info){
+    if(err)
+    {
+      return res.status(404).json({success:false,message:err});
+      console.error(err);
+    }
+    else
+    {
+      return res.status(200).json({success:true,message:"mail send successfully"});
+      console.log("mail send successfully");
+    }
+
+
+
+
+
+})
+  }
+  else
+  {
+    return res.status(200).status({success:false,message:"mail send failed"});
+  }
 })
 
 
