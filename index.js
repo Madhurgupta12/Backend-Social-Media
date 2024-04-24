@@ -9,6 +9,26 @@ app.use(express.json());
 app.use(cors());
 
 
+const io=require('socket.io')(8000);
+console.log(`socket server started on ${8000}`);
+const users={};
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    // Listen for chat messages
+    socket.on('chat message', (msg) => {
+        console.log(msg);
+        // Broadcast the message to all connected clients
+        io.emit('chat message', msg);
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+
 require("./models/post");
 require("./models/user");
 
