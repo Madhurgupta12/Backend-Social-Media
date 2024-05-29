@@ -61,65 +61,148 @@ Post.find({postedBy:req.user._id})
 })
 })
 
-router.put("/like",requiredLogin,(req,res)=>{
-    Post.findByIdAndUpdate(req.body.postId,{
-    $push:{likes:req.user._id}
-},{
-  new:true  
-}).then((result)=>{
-    if(result)
-    {
-       return res.json(result);
+// router.put("/like",requiredLogin,(req,res)=>{
+//     Post.findByIdAndUpdate(req.body.postId,{
+//     $push:{likes:req.user._id}
+// },{
+//   new:true  
+// }).then((result)=>{
+//     if(result)
+//     {
+//        return res.json(result);
         
+//     }
+//     else
+//     {
+//         return res.status(422).json({error:"Error Occured"});
+//     }
+// })
+// })
+
+router.put('/like', requiredLogin, async (req, res) => {
+    const { postId } = req.body;
+  
+    if (!postId) {
+      return res.status(422).json({ error: 'Post ID is required' });
     }
-    else
-    {
-        return res.status(422).json({error:err});
+  
+    try {
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+  
+      if (!post.likes.includes(req.user._id)) {
+        post.likes.push(req.user._id);
+      }
+  
+      const updatedPost = await post.save();
+      res.json(updatedPost);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Something went wrong' });
     }
-})
-})
-router.put("/dislike",requiredLogin,(req,res)=>{
-    Post.findByIdAndUpdate(req.body.postId,{
-    $pull:{likes:req.user._id}
-},{
-  new:true  
-}).then((result)=>{
-    if(result)
-    {
-        res.json(result);
-    }
-    else
-    {
-        return res.status(422).json({error:err});
+  });
+
+
+// router.put("/dislike",requiredLogin,(req,res)=>{
+//     Post.findByIdAndUpdate(req.body.postId,{
+//     $pull:{likes:req.user._id}
+// },{
+//   new:true  
+// }).then((result)=>{
+//     if(result)
+//     {
+//         res.json(result);
+//     }
+//     else
+//     {
+//         return res.status(422).json({error:err});
        
-    }
-})
-})
+//     }
+// })
+// })
 
-router.put("/comment",requiredLogin,(req,res)=>{
-    const comment={
-        text:req.body.text,
-        postedBy:req.user._id,
+router.put('/dislike', requiredLogin, async (req, res) => {
+    const { postId } = req.body;
+  
+    if (!postId) {
+      return res.status(422).json({ error: 'Post ID is required' });
     }
-    Post.findByIdAndUpdate(req.body.postId,{
-    $push:{comments:comment}
-},{
-  new:true  
-})
-.populate("comments.postedBy","_id name")
+  
+    try {
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+  
+      const likesIndex = post.likes.indexOf(req.user._id);
+      if (likesIndex > -1) {
+        post.likes.splice(likesIndex, 1);
+      }
+  
+      const updatedPost = await post.save();
+      res.json(updatedPost);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  });
 
-.then((result)=>{
-    if(result)
-    {
-       return res.json(result);
+// router.put("/comment",requiredLogin,(req,res)=>{
+//     const comment={
+//         text:req.body.text,
+//         postedBy:req.user._id,
+//     }
+//     Post.findByIdAndUpdate(req.body.postId,{
+//     $push:{comments:comment}
+// },{
+//   new:true  
+// })
+// .populate("comments.postedBy","_id name")
+
+// .then((result)=>{
+//     if(result)
+//     {
+//        return res.json(result);
         
+//     }
+//     else
+//     {
+//         return res.status(422).json({error:err});
+//     }
+// })
+// })
+
+router.put('/comment', requiredLogin, async (req, res) => {
+    const { text, postId } = req.body;
+  
+    if (!text || !postId) {
+      return res.status(422).json({ error: 'Text and Post ID are required' });
     }
-    else
-    {
-        return res.status(422).json({error:err});
+  
+    try {
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+  
+      const comment = {
+        text: text,
+        postedBy: req.user._id,
+      };
+  
+      post.comments.push(comment);
+  
+      const updatedPost = await post.save();
+      await updatedPost.populate('comments.postedBy', '_id name')
+      res.json(updatedPost);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Something went wrong' });
     }
-})
-})
+  });
+
 router.delete("/deletepost/:postId",requiredLogin,(req,res)=>{
     Post.findOne({_id:req.params.postId})
     .populate("postedBy","_id")
